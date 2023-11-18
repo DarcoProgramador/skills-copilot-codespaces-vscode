@@ -1,15 +1,39 @@
-const http = require('http');
+// Create web server
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const port = 3000;
+const comments = [];
 
-// Create a server object
-const server = http.createServer((req, res) => {
-  // Set the response header
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
+// Use body-parser to parse JSON body
+app.use(bodyParser.json());
 
-  // Send a response
-  res.end('Hello, world!');
+// GET
+app.get('/comments', (req, res) => res.json(comments));
+
+// POST
+app.post('/comments', (req, res) => {
+    const comment = req.body;
+    comments.push(comment);
+    res.json(comment);
 });
 
-// Start the server
-server.listen(3000, 'localhost', () => {
-  console.log('Server is running on http://localhost:3000');
+// DELETE
+app.delete('/comments/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const index = comments.findIndex(comment => comment.id === id);
+    comments.splice(index, 1);
+    res.json(id);
 });
+
+// PUT
+app.put('/comments/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const comment = req.body;
+    const index = comments.findIndex(comment => comment.id === id);
+    comments[index] = comment;
+    res.json(comment);
+});
+
+// Listen
+app.listen(port, () => console.log(`Server listening on port ${port}!`));
